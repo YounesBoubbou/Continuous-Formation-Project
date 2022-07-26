@@ -1,7 +1,6 @@
 from ast import main
 from calendar import c
 from cgitb import text
-from sqlite3 import Row
 from textwrap import TextWrapper, wrap
 from tkinter import *
 from tkinter.tix import COLUMN
@@ -269,30 +268,27 @@ def rechercher_elu_interface():
     root.destroy()
     root = Tk()
     root.title('Formation Continue')
-    root.geometry("800x600")
+    root.geometry("1050x600")
 
     def chercher_elu():
+        global sql 
+        global result 
         selected = drop.get()
         if selected == "Rechercher par...":
             label = Label(root, text="Veuillez Sélectionner une Catégorie de Recherche")
             label.grid(row=3, column=1)
+            result = not result
         if selected == "Nom de Famille":
-            label = Label(root, text="Vous Avez Choisi de Chercher par Nom de Famille")
-            label.grid(row=3, column=1)
+            sql = "Select elu_id, elu_nom, elu_prenom, elu_telephone, elu_email, elu_niveau_etudes, elu_fonction, elu_souhait from elu where elu_nom = %s"
         if selected == "Email":
-            label = Label(root, text="Vous Avez Choisi de Chercher par Email")
-            label.grid(row=3, column=1)
+            sql = "Select elu_id, elu_nom, elu_prenom, elu_telephone, elu_email, elu_niveau_etudes, elu_fonction, elu_souhait from elu where elu_email = %s"
         if selected == "Numéro (Id)":
-            label = Label(root, text="Vous Avez Choisi de Cherher par Id")
-            label.grid(row=3, column=1)
-
-        searched_label = Label(root, text="")
+            sql = "Select elu_id, elu_nom, elu_prenom, elu_telephone, elu_email, elu_niveau_etudes, elu_fonction, elu_souhait from elu where elu_id = %s"
         conn = None
         searched = search_box.get()
-        sql = "Select elu_nom, elu_prenom, elu_telephone, elu_email, elu_niveau_etudes, elu_fonction, elu_souhait from elu where elu_nom = %s"
         name = (searched, )
         try:
-            params = config()
+            params = config() 
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
             cur.execute(sql, name)
@@ -302,12 +298,40 @@ def rechercher_elu_interface():
         finally:
             if conn is not None:
                 conn.close()
-        
+
         if not result:
             result = "Elu non Trouvé..."
-        #Putting up the result on the screen
-        searched_label.config(text=result)
-        searched_label.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+            #Putting up the result on the screen
+            searched_label = Label(root, text=result)
+            searched_label.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+        
+        else:
+            Id_Label = Label(root, text="Numéro (Id)", font=("Helvetica, 14"))
+            Id_Label.grid(row=2, column=0)
+            Nom_Label = Label(root, text="Nom", font=("Helvetica, 14"))
+            Nom_Label.grid(row=2, column=1)
+            Prenom_Label = Label(root, text="Prenom", font=("Helvetica, 14"))
+            Prenom_Label.grid(row=2, column=2)
+            Telephone_Label = Label(root, text="Telephone", font=("Helvetica, 14"))
+            Telephone_Label.grid(row=2, column=3)
+            Email_Label = Label(root, text="Email", font=("Helvetica, 14"))
+            Email_Label.grid(row=2, column=4)
+            Niveau_Etudes_Label = Label(root, text="Niveau d'études", font=("Helvetica, 14"))
+            Niveau_Etudes_Label.grid(row=2, column=5)
+            Fonction_Label = Label(root, text="Fonction", font=("Helvetica, 14"))
+            Fonction_Label.grid(row=2, column=6)
+            Souhait_Label = Label(root, text="Souhait", font=("Helvetica, 14"))
+            Souhait_Label.grid(row=2, column=7)
+
+            for index, i in enumerate(result):
+                num = 0
+                index += 3
+                for y in i:
+                    elu_label = Label(root, text=y)
+                    elu_label.grid(row=index, column=num, pady=15, padx=5)
+                    num += 1
+            csv_button = Button(root, text="Exporter vers Excel", command=lambda: export_to_csv(result))
+            csv_button.grid(row=index + 1, column=0)
         
 
     #Label
@@ -323,9 +347,11 @@ def rechercher_elu_interface():
     drop = ttk.Combobox(root, value=["Rechercher par...", "Nom de Famille", "Email", "Numéro (Id)"])
     drop.current(0)
     drop.grid(row = 0, column=2)
+    Retour_Menu_Principal = Button(root, text="Retourner au Menu Principal", command=retour_au_menu_principal)
+    Retour_Menu_Principal.grid(row=1, column=1)
 
 
-#Bouton qui sert à exporter les résultats
+#Fonction qui sert à exporter les résultats vers Excel
 def export_to_csv(result):
     with open('customers.csv', 'a', newline="") as f:
         w = csv.writer(f, dialect='excel')
@@ -339,7 +365,23 @@ def afficher_elus_interface():
     root.destroy()
     root = Tk()
     root.title('Formation Continue')
-    root.geometry("1000x500")
+    root.geometry("1150x500")
+    Id_Label = Label(root, text="Numéro (Id)", font=("Helvetica, 14"))
+    Id_Label.grid(row=0, column=0)
+    Nom_Label = Label(root, text="Nom", font=("Helvetica, 14"))
+    Nom_Label.grid(row=0, column=1)
+    Prenom_Label = Label(root, text="Prenom", font=("Helvetica, 14"))
+    Prenom_Label.grid(row=0, column=2)
+    Telephone_Label = Label(root, text="Telephone", font=("Helvetica, 14"))
+    Telephone_Label.grid(row=0, column=3)
+    Email_Label = Label(root, text="Email", font=("Helvetica, 14"))
+    Email_Label.grid(row=0, column=4)
+    Niveau_Etudes_Label = Label(root, text="Niveau d'études", font=("Helvetica, 14"))
+    Niveau_Etudes_Label.grid(row=0, column=5)
+    Fonction_Label = Label(root, text="Fonction", font=("Helvetica, 14"))
+    Fonction_Label.grid(row=0, column=6)
+    Souhait_Label = Label(root, text="Souhait", font=("Helvetica, 14"))
+    Souhait_Label.grid(row=0, column=7)
     conn = None
     try: 
         params = config()
@@ -349,6 +391,7 @@ def afficher_elus_interface():
         result=cur.fetchall()
         for index, i in enumerate(result):
             num = 0
+            index += 1
             for y in i:
                 elu_label = Label(root, text=y)
                 elu_label.grid(row=index, column=num, pady=15, padx=5)
@@ -360,11 +403,11 @@ def afficher_elus_interface():
     finally:
         if conn is not None:
             conn.close()
-    csv_button = Button(root, text="Exporter les résultats vers Excel", command=lambda: export_to_csv(result), pady=5)
-    csv_button.place(x=800, y=20)
+    csv_button = Button(root, text="Exporter les résultats vers Excel", command=lambda: export_to_csv(result))
+    csv_button.place(x=900, y=20)
 
-    Retour_Menu_Principal = Button(root, text="Retourner au Menu Principal", command=retour_au_menu_principal, pady=5)
-    Retour_Menu_Principal.place(x=800, y=60) 
+    Retour_Menu_Principal = Button(root, text="Retourner au Menu Principal", command=retour_au_menu_principal)
+    Retour_Menu_Principal.place(x=900, y=60) 
     
 
 
