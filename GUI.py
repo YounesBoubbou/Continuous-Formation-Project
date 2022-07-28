@@ -109,56 +109,50 @@ def retour_au_menu_principal():
 def afficher_menu_principal():
     global root
     root = Tk()
-    root.geometry("600x650")
+    root.geometry("600x600")
     root.title("Formation Continue")
     #Putting up the title 
     menu_principal_titre = Label(root, text = "Formation Continue: Menu Principal\nQue souhaitez vous faire?", font = ("Helvetica", 16), bd=4)
-    menu_principal_titre.grid(row=0, column=0, columnspan=2, padx=140, pady=25)
+    menu_principal_titre.grid(row=0, column=0, columnspan=2, padx=135, pady=30)
 
     #Putting up labels and buttons on the left 
     Elu_Label = Label(root, text="Concernant les élus:", font=("Helvetica", 14))
-    Elu_Label.grid(row=1, column=0, padx=10, pady=25)
+    Elu_Label.grid(row=1, column=0, padx=10, pady=15)
 
-    Ajouter_Elu_Button = Button(root, text="Ajouter un élu à la base de données", command=ajouter_elu_interface,)
-    Ajouter_Elu_Button.grid(row=2, column=0, padx=10, pady=25)
+    Ajouter_Elu_Button = Button(root, text="Ajouter un élu à la base de données", command=ajouter_elu_interface, height=2, width=28)
+    Ajouter_Elu_Button.grid(row=2, column=0, padx=4, pady=15)
 
-    Rechercher_Elu_Button = Button(root, text="Rechercher un élu", command=rechercher_elu_interface)
-    Rechercher_Elu_Button.grid(row=3, column=0, padx=10, pady=25)
+    Rechercher_Elu_Button = Button(root, text="Rechercher/Changer les \ninformations des élus", command=rechercher_ou_changer_elu_interface, height=2, width=28)
+    Rechercher_Elu_Button.grid(row=3, column=0, padx=4, pady=15)
 
-    Changer_Elu_Button = Button(root, text="Changer les informations d'un élu")
-    Changer_Elu_Button.grid(row=4, column=0, padx=10, pady=25)
+    Supprimer_Elu_Button = Button(root, text="Supprimer les informations d'un élu", height=2, width=28)
+    Supprimer_Elu_Button.grid(row=4, column=0, padx=4, pady=15)
 
-    Supprimer_Elu_Button = Button(root, text="Supprimer les informations d'un élu")
-    Supprimer_Elu_Button.grid(row=5, column=0, padx=10, pady=25)
-
-    Afficher_Elus_Button = Button(root, text="Afficher tous les élus", command=afficher_elus_interface)
-    Afficher_Elus_Button.grid(row=6, column=0, padx=10, pady=25)
+    Afficher_Elus_Button = Button(root, text="Afficher tous les élus", command=afficher_elus_interface, height=2, width=28)
+    Afficher_Elus_Button.grid(row=5, column=0, padx=4, pady=15)
 
     #And on the right
     Formation_Label = Label(root, text="Concernant les formations:", font=("Helvetica", 14))
-    Formation_Label.grid(row=1, column=1, padx=10, pady=25)
+    Formation_Label.grid(row=1, column=1, padx=4, pady=6)
 
-    Ajouter_Formation_Button = Button(root, text="Ajouter une formation à la base de données")
-    Ajouter_Formation_Button.grid(row=2, column=1, padx=10, pady=25)
+    Ajouter_Formation_Button = Button(root, text="Ajouter une formation \nà la base de données", height=2, width=28)
+    Ajouter_Formation_Button.grid(row=2, column=1, padx=4, pady=15)
 
-    Rechercher_Formation_Button = Button(root, text="Rechercher une formation")
-    Rechercher_Formation_Button.grid(row=3, column=1, padx=10, pady=25)
+    Rechercher_Formation_Button = Button(root, text="Rechercher/Changer les \ninformations des formations", height=2, width=28)
+    Rechercher_Formation_Button.grid(row=3, column=1, padx=4, pady=15)
 
-    Changer_Formation_Button = Button(root, text="Changer les informations d'une formation")
-    Changer_Formation_Button.grid(row=4, column=1, padx=10, pady=25)
+    Supprimer_Formation_Button = Button(root, text="Supprimer les informations\n d'une formation", height=2, width=28)
+    Supprimer_Formation_Button.grid(row=4, column=1, padx=4, pady=15)
 
-    Supprimer_Formation_Button = Button(root, text="Supprimer les informations d'une formation")
-    Supprimer_Formation_Button.grid(row=5, column=1, padx=10, pady=25)
-
-    Afficher_Formation_Button = Button(root, text="Afficher toutes les formations")
-    Afficher_Formation_Button.grid(row=6, column=1, padx=10, pady=25)
+    Afficher_Formation_Button = Button(root, text="Afficher toutes les formations", height=2, width=28)
+    Afficher_Formation_Button.grid(row=5, column=1, padx=4, pady=15)
 
     #Adding a label and a button in the center
     Fonctions_Label = Label(root, text="Autres:", font=("Helvetica", 14))
-    Fonctions_Label.grid(row=7, column=0, columnspan=2)
+    Fonctions_Label.grid(row=6, column=0, columnspan=2, pady=5)
 
-    Fonctions_Button = Button(root, text="Utiliser les fonctions statistiques")
-    Fonctions_Button.grid(row=8, column=0, columnspan=2, pady=25)
+    Fonctions_Button = Button(root, text="Utiliser les fonctions statistiques", height=2, width=28)
+    Fonctions_Button.grid(row=7, column=0, columnspan=2, padx=4, pady=15)
 
 
 
@@ -263,13 +257,87 @@ def ajouter_elu_interface():
 
 
 #Interface pour chercher un élu spécifique par nom de famille
-def rechercher_elu_interface():
+def rechercher_ou_changer_elu_interface():
     global root
     root.destroy()
     root = Tk()
-    root.title('Formation Continue')
-    root.geometry("1050x600")
+    root.title('Formation Continue') 
+    root.geometry("1170x650")
 
+    def changer_elu(elu_numero, index):
+        index += 1
+        Nom2 = Label(root, text = "Nom")
+        Nom2.grid(row = index + 1, column=0, sticky = W, padx=10, pady=3)
+        Prenom2 = Label(root, text = "Prenom")
+        Prenom2.grid(row = index + 2, column=0, sticky = W, padx=10, pady=3)
+        Telephone2 = Label(root, text="Telephone")
+        Telephone2.grid(row= index + 3, column=0, sticky = W, padx=10, pady=3)
+        Email2 = Label(root, text="Email")
+        Email2.grid(row= index + 4, column=0, sticky=W, padx=10, pady=3)
+        Niveau_Etudes2 = Label(root, text="Niveau d'études")
+        Niveau_Etudes2.grid(row= index + 5, column=0, sticky = W, padx=10, pady=3)
+        Fonction2 = Label(root, text="Fonction")
+        Fonction2.grid(row= index + 6, column=0, sticky = W, padx=10, pady=3)
+        Commune2 = Label(root, text="Commune")
+        Commune2.grid(row= index + 7, column=0, sticky = W, padx=10, pady=3)
+        Souhait2 = Label(root, text="Souhait")
+        Souhait2.grid(row= index + 8, column=0, sticky = W, padx=10, pady=3)
+        Domaine2 = Label(root, text="Domaine")
+        Domaine2.grid(row= index + 9, column=0, sticky=W, padx=10, pady=3)
+        Besoin2 = Label(root, text="Besoin")
+        Besoin2.grid(row= index + 10, column=0, sticky=W, padx=10, pady=3)
+
+
+
+
+        #   Putting up the input boxes
+        global Nom_Box
+        Nom_Box2 = Entry(root, width=30)
+        Nom_Box2.grid(row = index + 1, column=1, pady=5)
+
+        global Prenom_Box
+        Prenom_Box2 = Entry(root, width=30)
+        Prenom_Box2.grid(row= index + 2, column=1, pady=5)
+
+        global Telephone_Box
+        Telephone_Box2 = Entry(root, width=30)
+        Telephone_Box2.grid(row= index + 3, column=1, pady = 5)
+
+        global Email_Box
+        Email_Box2 = Entry(root, width=30)
+        Email_Box2.grid(row= index + 4, column=1, pady=5)
+
+        global Niveau_Etudes_Box
+        Niveau_Etudes_Box2 = ttk.Combobox(root, value=["", "1. Néant", "2. Primaire", "3. Collège", "4. Lycée", "5. Institut Technique", "6. Universitaire", "7. Supérieur"], width=27)
+        Niveau_Etudes_Box2.current(0)
+        Niveau_Etudes_Box2.grid(row= index + 5, column=1, pady=5)
+
+        global Fonction_Box2
+        Fonction_Box2 = Entry(root, width=30)
+        Fonction_Box2.grid(row= index + 6, column=1, pady=5)
+
+        global Commune_Box2
+        Commune_Box2 = ttk.Combobox(root, value=["", "1. Rabat", "2. Temara", "3. Tamesna", "4. Sale", "5. Sale El Jadida", "6. Khmissat"], width=27)
+        Commune_Box2.current(0)
+        Commune_Box2.grid(row= index + 7, column=1, pady=5)
+
+        global Souhait_Box2
+        Souhait_Box2 = Entry(root, width=30)
+        Souhait_Box2.grid(row= index + 8, column=1, pady=5)
+        #Combo box for "Domaine" and "Besoin"
+        global Domaine_box2
+        Domaine_box2 = ttk.Combobox(root, value=["", "1. Urbanisme", "2. Finances", "3. Police Administrative", "4. Etat civil", "5. Environnement", "6. Transport Public", "7. Planification Stratégique"], width=27)
+        Domaine_box2.current(0)
+        Domaine_box2.grid(row= index + 9, column=1, pady=5)
+
+        global Besoin_box2
+        Besoin_box2 = ttk.Combobox(root, value=["", "1. Urbanisme", "2. Finances", "3. Police Administrative", "4. Etat civil", "5. Environnement", "6. Transport Public", "7. Planification Stratégique"], width=27)
+        Besoin_box2.current(0)
+        Besoin_box2.grid(row= index + 10, column=1, pady=5)
+        
+        save_button = Button(root, text="Sauvegarder les changements")
+        save_button.grid(row=index + 11, column=1, padx=10)
+    
     def chercher_elu():
         global sql 
         global result 
@@ -307,31 +375,34 @@ def rechercher_elu_interface():
         
         else:
             Id_Label = Label(root, text="Numéro (Id)", font=("Helvetica, 14"))
-            Id_Label.grid(row=2, column=0)
+            Id_Label.grid(row=2, column=1)
             Nom_Label = Label(root, text="Nom", font=("Helvetica, 14"))
-            Nom_Label.grid(row=2, column=1)
+            Nom_Label.grid(row=2, column=2)
             Prenom_Label = Label(root, text="Prenom", font=("Helvetica, 14"))
-            Prenom_Label.grid(row=2, column=2)
+            Prenom_Label.grid(row=2, column=3)
             Telephone_Label = Label(root, text="Telephone", font=("Helvetica, 14"))
-            Telephone_Label.grid(row=2, column=3)
+            Telephone_Label.grid(row=2, column=4)
             Email_Label = Label(root, text="Email", font=("Helvetica, 14"))
-            Email_Label.grid(row=2, column=4)
+            Email_Label.grid(row=2, column=5)
             Niveau_Etudes_Label = Label(root, text="Niveau d'études", font=("Helvetica, 14"))
-            Niveau_Etudes_Label.grid(row=2, column=5)
+            Niveau_Etudes_Label.grid(row=2, column=6)
             Fonction_Label = Label(root, text="Fonction", font=("Helvetica, 14"))
-            Fonction_Label.grid(row=2, column=6)
+            Fonction_Label.grid(row=2, column=7)
             Souhait_Label = Label(root, text="Souhait", font=("Helvetica, 14"))
-            Souhait_Label.grid(row=2, column=7)
+            Souhait_Label.grid(row=2, column=8)
 
             for index, i in enumerate(result):
                 num = 0
                 index += 3
+                numero_elu = result[0]
+                edit_button = Button(root, text="Changer les\n inforamtions", command=lambda:changer_elu(numero_elu, index))
+                edit_button.grid(row=index, column=num)
                 for y in i:
                     elu_label = Label(root, text=y)
-                    elu_label.grid(row=index, column=num, pady=15, padx=5)
+                    elu_label.grid(row=index, column=num + 1, pady=15, padx=5)
                     num += 1
             csv_button = Button(root, text="Exporter vers Excel", command=lambda: export_to_csv(result))
-            csv_button.grid(row=index + 1, column=0)
+            csv_button.grid(row=index + 1, column=0, pady=10)
         
 
     #Label
