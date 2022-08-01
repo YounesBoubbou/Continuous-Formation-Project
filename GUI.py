@@ -7,9 +7,10 @@ from tkinter.tix import COLUMN
 from tokenize import cookie_re
 from turtle import width
 from unittest import result
-from unittest.util import _count_diff_all_purpose 
+from unittest.util import _count_diff_all_purpose   
 from PIL import ImageTk, Image
 import psycopg2
+from sqlalchemy import case
 from config import config
 from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
@@ -256,7 +257,7 @@ def ajouter_elu_interface():
 
 
 
-#Interface pour chercher un élu spécifique par nom de famille
+#Interface pour chercher un élu spécifique par nom de famille, Email, ou Id avec possibilité de changer les infos de cet élu
 def rechercher_ou_changer_elu_interface():
     global root
     root.destroy()
@@ -264,7 +265,30 @@ def rechercher_ou_changer_elu_interface():
     root.title('Formation Continue') 
     root.geometry("1170x650")
 
+    def update_elu():
+            return
+            
     def changer_elu(elu_numero, index):
+        
+            
+        global sql2
+        global resultat
+        sql2 = "Select * from elu where elu_id = %s"
+        conn2 = None
+        name2 = (elu_numero[0], )
+        try:
+            params = config() 
+            conn2 = psycopg2.connect(**params)
+            cur2 = conn2.cursor()
+            cur2.execute(sql2, name2)
+            resultat = cur2.fetchall()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn2 is not None:
+                conn2.close()   
+        
+            
         index += 1
         Nom2 = Label(root, text = "Nom")
         Nom2.grid(row = index + 1, column=0, sticky = W, padx=10, pady=3)
@@ -291,51 +315,91 @@ def rechercher_ou_changer_elu_interface():
 
 
         #   Putting up the input boxes
-        global Nom_Box
+        global Nom_Box2
         Nom_Box2 = Entry(root, width=30)
         Nom_Box2.grid(row = index + 1, column=1, pady=5)
+        Nom_Box2.insert(0, resultat[0][1])
+        
 
-        global Prenom_Box
+        global Prenom_Box2
         Prenom_Box2 = Entry(root, width=30)
         Prenom_Box2.grid(row= index + 2, column=1, pady=5)
+        Prenom_Box2.insert(0, resultat[0][2])
 
-        global Telephone_Box
+        global Telephone_Box2
         Telephone_Box2 = Entry(root, width=30)
         Telephone_Box2.grid(row= index + 3, column=1, pady = 5)
+        Telephone_Box2.insert(0, resultat[0][3])
 
-        global Email_Box
+        global Email_Box2
         Email_Box2 = Entry(root, width=30)
         Email_Box2.grid(row= index + 4, column=1, pady=5)
+        Email_Box2.insert(0, resultat[0][4])
 
-        global Niveau_Etudes_Box
+        global Niveau_Etudes_Box2
         Niveau_Etudes_Box2 = ttk.Combobox(root, value=["", "1. Néant", "2. Primaire", "3. Collège", "4. Lycée", "5. Institut Technique", "6. Universitaire", "7. Supérieur"], width=27)
         Niveau_Etudes_Box2.current(0)
         Niveau_Etudes_Box2.grid(row= index + 5, column=1, pady=5)
+        Niveau_Etudes_Box2.insert(0, resultat[0][5])
 
         global Fonction_Box2
         Fonction_Box2 = Entry(root, width=30)
         Fonction_Box2.grid(row= index + 6, column=1, pady=5)
+        Fonction_Box2.insert(0, resultat[0][6])
 
         global Commune_Box2
         Commune_Box2 = ttk.Combobox(root, value=["", "1. Rabat", "2. Temara", "3. Tamesna", "4. Sale", "5. Sale El Jadida", "6. Khmissat"], width=27)
         Commune_Box2.current(0)
         Commune_Box2.grid(row= index + 7, column=1, pady=5)
+        Commune_Box2.insert(0, resultat[0][7])
+        
 
         global Souhait_Box2
         Souhait_Box2 = Entry(root, width=30)
         Souhait_Box2.grid(row= index + 8, column=1, pady=5)
+        Souhait_Box2.insert(0, resultat[0][8])
         #Combo box for "Domaine" and "Besoin"
         global Domaine_box2
         Domaine_box2 = ttk.Combobox(root, value=["", "1. Urbanisme", "2. Finances", "3. Police Administrative", "4. Etat civil", "5. Environnement", "6. Transport Public", "7. Planification Stratégique"], width=27)
         Domaine_box2.current(0)
         Domaine_box2.grid(row= index + 9, column=1, pady=5)
+        if resultat[0][9] == 1:
+            Domaine_box2.insert(0, "1. Urbanisme")
+        elif resultat[0][9] == 2:
+            Domaine_box2.insert(0, "2. Finances")
+        elif resultat[0][9] == 3:
+            Domaine_box2.insert(0, "3. Police Administrative")
+        elif resultat[0][9] == 4:
+            Domaine_box2.insert(0, "4. Etat civil")
+        elif resultat[0][9] == 5:
+            Domaine_box2.insert(0, "5. Environnement")
+        elif resultat[0][9] == 6:
+            Domaine_box2.insert(0, "6. Transport Public")
+        elif resultat[0][9] == 7:
+            Domaine_box2.insert(0, "7. Planification Stratégique")
 
         global Besoin_box2
         Besoin_box2 = ttk.Combobox(root, value=["", "1. Urbanisme", "2. Finances", "3. Police Administrative", "4. Etat civil", "5. Environnement", "6. Transport Public", "7. Planification Stratégique"], width=27)
         Besoin_box2.current(0)
         Besoin_box2.grid(row= index + 10, column=1, pady=5)
+        if resultat[0][10] == 1:
+            Besoin_box2.insert(0, "1. Urbanisme")
+        elif resultat[0][10] == 2:
+            Besoin_box2.insert(0, "2. Finances")
+        elif resultat[0][10] == 3:
+            Besoin_box2.insert(0, "3. Police Administrative")
+        elif resultat[0][10] == 4:
+            Besoin_box2.insert(0, "4. Etat civil")
+        elif resultat[0][10] == 5:
+            Besoin_box2.insert(0, "5. Environnement")
+        elif resultat[0][10] == 6:
+            Besoin_box2.insert(0, "6. Transport Public")
+        elif resultat[0][10] == 7:
+            Besoin_box2.insert(0, "7. Planification Stratégique")
+
         
-        save_button = Button(root, text="Sauvegarder les changements")
+        
+        save_button = Button(root, text="Sauvegarder les changements", command=update_elu)
         save_button.grid(row=index + 11, column=1, padx=10)
     
     def chercher_elu():
