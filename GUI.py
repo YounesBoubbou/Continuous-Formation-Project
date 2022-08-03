@@ -10,6 +10,7 @@ from unittest import result
 from unittest.util import _count_diff_all_purpose   
 from PIL import ImageTk, Image
 import psycopg2
+from setuptools import Command
 from sqlalchemy import case
 from config import config
 from tkinter import ttk
@@ -126,7 +127,7 @@ def afficher_menu_principal():
     Rechercher_Elu_Button = Button(root, text="Rechercher/Changer les \ninformations des élus", command=rechercher_ou_changer_elu_interface, height=2, width=28)
     Rechercher_Elu_Button.grid(row=3, column=0, padx=4, pady=15)
 
-    Supprimer_Elu_Button = Button(root, text="Supprimer les informations d'un élu", height=2, width=28)
+    Supprimer_Elu_Button = Button(root, text="Supprimer les informations d'un élu", height=2, width=28, command = supprimer_elu_interface)
     Supprimer_Elu_Button.grid(row=4, column=0, padx=4, pady=15)
 
     Afficher_Elus_Button = Button(root, text="Afficher tous les élus", command=afficher_elus_interface, height=2, width=28)
@@ -266,11 +267,39 @@ def rechercher_ou_changer_elu_interface():
     root.geometry("1170x650")
 
     def update_elu():
-            return
-            
-    def changer_elu(elu_numero, index):
+        #Here, we're extracting the Id of "domaine" from the string present in the combo box
+        domaine_id2 = Domaine_box2.get()[0]
+        #Same thing for "besoin"
+        besoin_id2 = Besoin_box2.get()[0]
+        #And finally, we do the same thing for commune
+        commune_id2 = Commune_Box2.get()[0]
+        #To get the name of "la commune" only from the "Commune" combo box, we strip out the first three characters.
+        #For example, if the first commune is "1. Rabat", we split out the first three characters 
+        Commune2 = Commune_Box2.get()
+        Commune2 = Commune2[3:]
+        #We do the same thing for "Niveau d'études"
+        niveau_etudes2 = Niveau_Etudes_Box2.get()
+        niveau_etudes2 = niveau_etudes2[3:]
+        sql_update = "Update elu set elu_nom = %s, elu_prenom = %s, elu_telephone = %s, elu_email = %s, elu_niveau_etudes = %s, elu_fonction = %s, elu_commune = %s, elu_souhait = %s, domaine_id = %s, besoin_id = %s, commune_id = %s where elu_id = %s"
+        updated_values = (Nom_Box2.get(), Prenom_Box2.get(), Telephone_Box2.get(), Email_Box2.get(), Niveau_Etudes_Box2.get(), Fonction_Box2.get(), Commune2, Souhait_Box2.get(), domaine_id2, besoin_id2, commune_id2, update_id)
+        updated_conn = None
+        try: 
+            params = config()
+            updated_conn = psycopg2.connect(**params)
+            updated_cur = updated_conn.cursor()
+            updated_cur.execute(sql_update, updated_values)
+            updated_conn.commit()
+            updated_cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if updated_conn is not None:
+                updated_conn.close()
         
             
+    def changer_elu(elu_numero, index):
+        global update_id
+        update_id = elu_numero[0]
         global sql2
         global resultat
         sql2 = "Select * from elu where elu_id = %s"
@@ -351,13 +380,25 @@ def rechercher_ou_changer_elu_interface():
         Commune_Box2 = ttk.Combobox(root, value=["", "1. Rabat", "2. Temara", "3. Tamesna", "4. Sale", "5. Sale El Jadida", "6. Khmissat"], width=27)
         Commune_Box2.current(0)
         Commune_Box2.grid(row= index + 7, column=1, pady=5)
-        Commune_Box2.insert(0, resultat[0][7])
+        if resultat[0][7] == "Rabat":
+            Commune_Box2.insert(0, "1. Rabat")
+        elif resultat[0][7] == "Temara":
+            Commune_Box2.insert(0, "2. Temara")
+        elif resultat[0][7] == "Tamesna":
+            Commune_Box2.insert(0, "3. Tamesna")
+        elif resultat[0][7] == "Sale":
+            Commune_Box2.insert(0, "4. Sale")
+        elif resultat[0][7] == "Sale El Jadida":
+            Commune_Box2.insert(0, "5. Sale El Jadida")
+        elif resultat[0][7] == "Khmissat":
+            Commune_Box2.insert(0, "6. Khmissat")
         
 
         global Souhait_Box2
         Souhait_Box2 = Entry(root, width=30)
         Souhait_Box2.grid(row= index + 8, column=1, pady=5)
         Souhait_Box2.insert(0, resultat[0][8])
+
         #Combo box for "Domaine" and "Besoin"
         global Domaine_box2
         Domaine_box2 = ttk.Combobox(root, value=["", "1. Urbanisme", "2. Finances", "3. Police Administrative", "4. Etat civil", "5. Environnement", "6. Transport Public", "7. Planification Stratégique"], width=27)
@@ -484,6 +525,7 @@ def rechercher_ou_changer_elu_interface():
     drop.grid(row = 0, column=2)
     Retour_Menu_Principal = Button(root, text="Retourner au Menu Principal", command=retour_au_menu_principal)
     Retour_Menu_Principal.grid(row=1, column=1)
+    
 
 
 #Fonction qui sert à exporter les résultats vers Excel
@@ -543,7 +585,10 @@ def afficher_elus_interface():
 
     Retour_Menu_Principal = Button(root, text="Retourner au Menu Principal", command=retour_au_menu_principal)
     Retour_Menu_Principal.place(x=900, y=60) 
+
+def supprimer_elu_interface():
     
+    return
 
 
 afficher_menu_principal()
