@@ -587,7 +587,113 @@ def afficher_elus_interface():
     Retour_Menu_Principal.place(x=900, y=60) 
 
 def supprimer_elu_interface():
+    global root
+    root.destroy()
+    root = Tk()
+    root.title('Formation Continue')
+    root.geometry("1170x650")
+
+    def supprimer_elu(deleting_numero_elu, index):
+        global deleting_id
+        deleting_id = deleting_numero_elu[0]
+        sql3 = "delete from elu where elu_id = %s"
+        name = (deleting_id, )
+        conn = None
+        try:
+            params = config() 
+            conn = psycopg2.connect(**params)
+            cur = conn.cursor()
+            cur.execute(sql3, name)
+            conn.commit()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+        deleting_label = Label(root, text="L'élu numéro " + str(deleting_id) + " a bien été supprimé")
+        deleting_label.grid(row=index + 1, column=0)
+        return
     
+    def chercher_elu2():
+        global deleting_sql 
+        global result2
+        selected2 = deleting_drop.get()
+        if selected2 == "Rechercher par...":
+            label2 = Label(root, text="Veuillez Sélectionner une Catégorie de Recherche")
+            label2.grid(row=3, column=1)
+            result2 = not result2
+        if selected2 == "Nom de Famille":
+            deleting_sql = "Select elu_id, elu_nom, elu_prenom, elu_telephone, elu_email, elu_niveau_etudes, elu_fonction, elu_souhait from elu where elu_nom = %s"
+        if selected2 == "Email":
+            deleting_sql = "Select elu_id, elu_nom, elu_prenom, elu_telephone, elu_email, elu_niveau_etudes, elu_fonction, elu_souhait from elu where elu_email = %s"
+        if selected2 == "Numéro (Id)":
+            deleting_sql = "Select elu_id, elu_nom, elu_prenom, elu_telephone, elu_email, elu_niveau_etudes, elu_fonction, elu_souhait from elu where elu_id = %s"
+        conn = None
+        searched2 = deleting_search_box.get()
+        name = (searched2, )
+        try:
+            params = config() 
+            conn = psycopg2.connect(**params)
+            cur = conn.cursor()
+            cur.execute(deleting_sql, name)
+            result2 = cur.fetchall()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+
+        if not result2:
+            result2 = "Elu non Trouvé..."
+            #Putting up the result on the screen
+            searched_label2 = Label(root, text=result2)
+            searched_label2.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+        
+        else:
+            Id_Label = Label(root, text="Numéro (Id)", font=("Helvetica, 14"))
+            Id_Label.grid(row=2, column=1)
+            Nom_Label = Label(root, text="Nom", font=("Helvetica, 14"))
+            Nom_Label.grid(row=2, column=2)
+            Prenom_Label = Label(root, text="Prenom", font=("Helvetica, 14"))
+            Prenom_Label.grid(row=2, column=3)
+            Telephone_Label = Label(root, text="Telephone", font=("Helvetica, 14"))
+            Telephone_Label.grid(row=2, column=4)
+            Email_Label = Label(root, text="Email", font=("Helvetica, 14"))
+            Email_Label.grid(row=2, column=5)
+            Niveau_Etudes_Label = Label(root, text="Niveau d'études", font=("Helvetica, 14"))
+            Niveau_Etudes_Label.grid(row=2, column=6)
+            Fonction_Label = Label(root, text="Fonction", font=("Helvetica, 14"))
+            Fonction_Label.grid(row=2, column=7)
+            Souhait_Label = Label(root, text="Souhait", font=("Helvetica, 14"))
+            Souhait_Label.grid(row=2, column=8)
+
+            for index, i in enumerate(result2):
+                num = 0
+                index += 3
+                deleting_numero_elu = result2[0]
+                edit_button = Button(root, text="Supprimer cet élu", command=lambda:supprimer_elu(deleting_numero_elu, index))
+                edit_button.grid(row=index, column=num)
+                for y in i:
+                    elu_label = Label(root, text=y)
+                    elu_label.grid(row=index, column=num + 1, pady=15, padx=5)
+                    num += 1
+           
+    #Label
+    deleting_label = Label(root, text="Rechercher un élu")
+    deleting_label.grid(row=0, column=0, padx=10, pady=10)
+    #Entry box pour entrer le nom de famille
+    deleting_search_box = Entry(root)
+    deleting_search_box.grid(row=0, column=1, padx=10, pady=10)
+    #Bouton pour rechercher
+    deleting_search_button = Button(root, text="Chercher élu", command=chercher_elu2)
+    deleting_search_button.grid(row=1, column=0, padx=10, pady=10)
+    #Drop down Box
+    deleting_drop = ttk.Combobox(root, value=["Rechercher par...", "Nom de Famille", "Email", "Numéro (Id)"])
+    deleting_drop.current(0)
+    deleting_drop.grid(row = 0, column=2)
+    Retour_Menu_Principal = Button(root, text="Retourner au Menu Principal", command=retour_au_menu_principal)
+    Retour_Menu_Principal.grid(row=1, column=1)
     return
 
 
